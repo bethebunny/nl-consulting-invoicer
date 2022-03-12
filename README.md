@@ -15,6 +15,12 @@ can code in TypeScript with React enabled, easily iterate locally, and then when
 
 https://bethebunny.github.io/nl-consulting-invoicer
 
+# Basic React template
+
+If you want a basic template that has a simple React app working along with the pages deployment system, check out
+[the minimal-react-page tag](https://github.com/bethebunny/nl-consulting-invoicer/releases/tag/minimal-react-page), and
+follow the instructions to create a minimal react page with typescript support.
+
 # Local development
 
 This project is designed to be easy to both read from a browser as well
