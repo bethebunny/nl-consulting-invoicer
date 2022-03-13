@@ -68,9 +68,16 @@ class Client {
   unfiledSessions = (): Session[] => this.sessions().filter(({date_filed}) => date_filed === "")
 }
 
-let App = (props) => {
-  const [pasteData, setPasteData] = useState(null);
+let App = ({defaultData}) => {
+  const [pasteData, _setPasteData] = useState(defaultData || null);
   var content = <div>Page failed to render :(</div>;
+
+  let setPasteData = (data: string) => {
+    let url = new URL(window.location.href);
+    url.searchParams.set('data', btoa(data));
+    window.history.pushState({}, '', url);
+    _setPasteData(data);
+  }
   if (pasteData != null) {
     let client = new Client(pasteData);
     console.log(client);
@@ -112,7 +119,9 @@ let setup = () => {
 };
 
 let main = () => {
-  ReactDOM.render(<App />, document.getElementById("root"));
+  let searchParams = new URLSearchParams(window.location.search);
+  let data = searchParams.has('data')? atob(searchParams.get('data')) : null;
+  ReactDOM.render(<App defaultData={data} />, document.getElementById("root"));
 };
 
 document.addEventListener('DOMContentLoaded', () => setup().then(main));
