@@ -45,9 +45,15 @@ class Client {
     }
     unfiledSessions = () => this.sessions().filter(({ date_filed }) => date_filed === "");
 }
-let App = (props) => {
-    const [pasteData, setPasteData] = useState(null);
+let App = ({ defaultData }) => {
+    const [pasteData, _setPasteData] = useState(defaultData || null);
     var content = React.createElement("div", null, "Page failed to render :(");
+    let setPasteData = (data) => {
+        let url = new URL(window.location.href);
+        url.searchParams.set('data', btoa(data));
+        window.history.pushState({}, '', url);
+        _setPasteData(data);
+    };
     if (pasteData != null) {
         let client = new Client(pasteData);
         console.log(client);
@@ -82,6 +88,8 @@ let setup = () => {
     return new Promise((resolve) => resolve(null));
 };
 let main = () => {
-    ReactDOM.render(React.createElement(App, null), document.getElementById("root"));
+    let searchParams = new URLSearchParams(window.location.search);
+    let data = searchParams.has('data') ? atob(searchParams.get('data')) : null;
+    ReactDOM.render(React.createElement(App, { defaultData: data }), document.getElementById("root"));
 };
 document.addEventListener('DOMContentLoaded', () => setup().then(main));
