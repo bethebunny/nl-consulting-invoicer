@@ -63,6 +63,12 @@ let invoiceTotal = (sessions: Session[]): number => (
 let toDollarAmount = (n: number): string =>
   "$" + n.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2});
 
+let today = (): string => {
+  //https://stackoverflow.com/questions/1531093/how-do-i-get-the-current-date-in-javascript/31934378#31934378
+  let d = new Date();
+  return new Date(d.getTime() - d.getTimezoneOffset() * 60000).toJSON().slice(0, 10);
+}
+
 let App = ({defaultData}) => {
   const [pasteData, _setPasteData] = useState(defaultData || null);
   var content = <div>Page failed to render :(</div>;
@@ -79,7 +85,7 @@ let App = ({defaultData}) => {
     let total = invoiceTotal(unfiledSessions);
     content = <div>
       <h2>NL Consulting Invoice for {client.name()}</h2>
-      <b>Invoice date: {new Date().toJSON().slice(0, 10)}</b>
+      <b>Invoice date: {today()}</b>
       <table>
         <thead><tr><th>Date</th><th>Who</th><th>Charge</th></tr></thead>
         <tbody>
