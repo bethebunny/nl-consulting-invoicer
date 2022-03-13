@@ -68,6 +68,12 @@ class Client {
   unfiledSessions = (): Session[] => this.sessions().filter(({date_filed}) => date_filed === "")
 }
 
+let invoiceTotal = (sessions: Session[]): number => (
+  sessions
+    .map(s => Number(s.charge.replace(/[^0-9.-]+/g, '') || '0'))
+    .reduce((a, b) => a + b, 0)
+);
+
 let App = ({defaultData}) => {
   const [pasteData, _setPasteData] = useState(defaultData || null);
   var content = <div>Page failed to render :(</div>;
@@ -80,19 +86,23 @@ let App = ({defaultData}) => {
   }
   if (pasteData != null) {
     let client = new Client(pasteData);
-    console.log(client);
+    let unfiledSessions = client.unfiledSessions();
+    let total = invoiceTotal(unfiledSessions);
     content = <div>
-      <h2>{client.name()}</h2>
-        <table>
-          <thead><tr><th>Date</th><th>Who</th><th>Charge</th></tr></thead>
-          <tbody>
-            {client.unfiledSessions().map((s, i) => <tr key={i}>
-              <td>{s.date}</td>
-              <td>{s.who}</td>
-              <td>{s.charge}</td>
-            </tr>)}
-          </tbody>
-        </table>
+      <h2>NL Consulting Invoice for {client.name()}</h2>
+      <b>Invoice date: {new Date().toJSON().slice(0, 10)}</b>
+      <table>
+        <thead><tr><th>Date</th><th>Who</th><th>Charge</th></tr></thead>
+        <tbody>
+          {unfiledSessions.map((s, i) => <tr key={i}>
+            <td>{s.date}</td>
+            <td>{s.who}</td>
+            <td>{s.charge}</td>
+          </tr>)}
+        </tbody>
+      </table>
+      <h3>Invoice total: ${total}</h3>
+      <p>Please make checks payable to NL Consulting.</p>
       </div>;
   } else {
     content = <div>
