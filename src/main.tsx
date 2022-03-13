@@ -1,10 +1,108 @@
-import React from 'https://unpkg.com/es-react@16.13.1/dev/react.js';
+import React, { useState } from 'https://unpkg.com/es-react@16.13.1/dev/react.js';
 import ReactDOM from 'https://unpkg.com/es-react@16.13.1/dev/react-dom.js';
+import * as csv_parse from "https://www.unpkg.com/csv-parse@5.0.4/dist/esm/sync.js";
 
-class App extends React.Component {
-  render() {
-    return <div className="App"><h1>Hello!</h1></div>;
+// const pasteHandler = (event: React.ClipboardEvent<HTMLTextAreaElement>) => {
+//   event.currentTarget.style.border = "5px solid purple";
+//   event.currentTarget.style.backgroundColor = "orange";
+
+//   console.log(event.clipboardData.getData("text"));
+
+//   // Transform the copied/cut text to upper case
+//   event.currentTarget.value = event.clipboardData
+//     .getData("text")
+//     .toUpperCase();
+
+//   console.log(event.clipboardData.getData("text"));
+
+//   event.preventDefault();
+// };
+
+// Cheap for now, only support first 26 columns
+let COLUMNS: string = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'
+
+interface Session {
+  date: string
+  who: string
+  charge: string
+  date_filed: string
+  date_paid: string
+  paid_amount: string
+}
+
+
+class Client {
+  data: string[][]
+  constructor(tsv_data: string) {
+    this.data = csv_parse.parse(tsv_data, {
+      delimiter: "\t",
+      trim: true,
+    })
   }
+
+  cell(name: string): string {
+    let column = COLUMNS.indexOf(name[0].toUpperCase());
+    // -1 because Excel rows index by 1
+    let row = parseInt(name.substring(1)) - 1;
+    return this.data[row][column];
+  }
+
+  name = (): string => this.cell('B1');
+  insurer = (): string => this.cell('B2');
+  deductable = (): string => this.cell('B3');
+  copay = (): string => this.cell('B4');
+  effectiveDate = (): string => this.cell('B5');
+  perSessionCharge = (): string => this.cell('B6');
+  otherInsured = (): string => this.cell('B7');
+
+  sessions(): Session[] {
+    return (this.data
+      .map(row => row.slice(2, 8))
+      .filter(row => row.some(cell => cell != ""))
+      .map(([date, who, charge, date_filed, date_paid, paid_amount]) => {
+        return {date, who, charge, date_filed, date_paid, paid_amount};
+      })
+    );
+  }
+
+  unfiledSessions = (): Session[] => this.sessions().filter(({date_filed}) => date_filed === "")
+}
+
+let App = (props) => {
+  const [pasteData, setPasteData] = useState();
+  var content = <div>Page failed to render :(</div>;
+  if (pasteData != null) {
+    let client = new Client(pasteData);
+    console.log(client);
+    content = <div>
+      <h2>{client.name()}</h2>
+        <table>
+          <thead><tr><th>Date</th><th>Who</th><th>Charge</th></tr></thead>
+          <tbody>
+            {client.unfiledSessions().map((s, i) => <tr key={i}>
+              <td>{s.date}</td>
+              <td>{s.who}</td>
+              <td>{s.charge}</td>
+            </tr>)}
+          </tbody>
+        </table>
+      </div>;
+  } else {
+    content = <div>
+      <h1>NL Consulting Invoice Generator</h1>
+        <b>
+          <ol>
+            <li>Select the sheet you want to bill</li>
+            <li>Control-A then Control-C to copy the whole sheet</li>
+            <li>Come back here</li>
+            <li>Control-V to create an invoice</li>
+            <li>Control-P to print or save to PDF!</li>
+            <li>If desired, paste new data here to re-generate.</li>
+          </ol>
+        </b>
+    </div>;
+  }
+  return <div className="App" onPaste={(e) => setPasteData(e.clipboardData.getData("text"))}>{content}</div>;
 }
 
 let setup = () => {

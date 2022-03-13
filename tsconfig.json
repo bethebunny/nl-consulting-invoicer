@@ -3,7 +3,7 @@
     "module": "esnext",
     "target": "esnext",
     "removeComments": false,
-    "sourceMap": true,
+    "sourceMap": false,
     "moduleResolution": "node",
     "esModuleInterop": true,
     "skipLibCheck": true,
