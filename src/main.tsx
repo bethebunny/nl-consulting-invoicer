@@ -69,7 +69,7 @@ class Client {
 }
 
 let App = (props) => {
-  const [pasteData, setPasteData] = useState();
+  const [pasteData, setPasteData] = useState(null);
   var content = <div>Page failed to render :(</div>;
   if (pasteData != null) {
     let client = new Client(pasteData);
