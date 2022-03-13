@@ -1,17 +1,6 @@
 import React, { useState } from 'https://unpkg.com/es-react@16.13.1/dev/react.js';
 import ReactDOM from 'https://unpkg.com/es-react@16.13.1/dev/react-dom.js';
 import * as csv_parse from "https://www.unpkg.com/csv-parse@5.0.4/dist/esm/sync.js";
-// const pasteHandler = (event: React.ClipboardEvent<HTMLTextAreaElement>) => {
-//   event.currentTarget.style.border = "5px solid purple";
-//   event.currentTarget.style.backgroundColor = "orange";
-//   console.log(event.clipboardData.getData("text"));
-//   // Transform the copied/cut text to upper case
-//   event.currentTarget.value = event.clipboardData
-//     .getData("text")
-//     .toUpperCase();
-//   console.log(event.clipboardData.getData("text"));
-//   event.preventDefault();
-// };
 // Cheap for now, only support first 26 columns
 let COLUMNS = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
 class Client {
@@ -20,6 +9,8 @@ class Client {
         this.data = csv_parse.parse(tsv_data, {
             delimiter: "\t",
             trim: true,
+            skip_empty_lines: true,
+            skip_records_with_empty_values: true,
         });
     }
     cell(name) {
