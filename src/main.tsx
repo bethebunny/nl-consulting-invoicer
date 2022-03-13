@@ -60,6 +60,9 @@ let invoiceTotal = (sessions: Session[]): number => (
     .reduce((a, b) => a + b, 0)
 );
 
+let toDollarAmount = (n: number): string =>
+  "$" + n.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2});
+
 let App = ({defaultData}) => {
   const [pasteData, _setPasteData] = useState(defaultData || null);
   var content = <div>Page failed to render :(</div>;
@@ -87,7 +90,7 @@ let App = ({defaultData}) => {
           </tr>)}
         </tbody>
       </table>
-      <h3>Invoice total: ${total}</h3>
+      <h3>Invoice total: {toDollarAmount(total)}</h3>
       <p>Please make checks payable to NL Consulting.</p>
       </div>;
   } else {
