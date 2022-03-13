@@ -39,6 +39,12 @@ class Client {
 let invoiceTotal = (sessions) => (sessions
     .map(s => Number(s.charge.replace(/[^0-9.-]+/g, '') || '0'))
     .reduce((a, b) => a + b, 0));
+let toDollarAmount = (n) => "$" + n.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+let today = () => {
+    //https://stackoverflow.com/questions/1531093/how-do-i-get-the-current-date-in-javascript/31934378#31934378
+    let d = new Date();
+    return new Date(d.getTime() - d.getTimezoneOffset() * 60000).toJSON().slice(0, 10);
+};
 let App = ({ defaultData }) => {
     const [pasteData, _setPasteData] = useState(defaultData || null);
     var content = React.createElement("div", null, "Page failed to render :(");
@@ -58,7 +64,7 @@ let App = ({ defaultData }) => {
                 client.name()),
             React.createElement("b", null,
                 "Invoice date: ",
-                new Date().toJSON().slice(0, 10)),
+                today()),
             React.createElement("table", null,
                 React.createElement("thead", null,
                     React.createElement("tr", null,
@@ -70,8 +76,8 @@ let App = ({ defaultData }) => {
                     React.createElement("td", null, s.who),
                     React.createElement("td", null, s.charge))))),
             React.createElement("h3", null,
-                "Invoice total: $",
-                total),
+                "Invoice total: ",
+                toDollarAmount(total)),
             React.createElement("p", null, "Please make checks payable to NL Consulting."));
     }
     else {
