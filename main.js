@@ -45,6 +45,9 @@ class Client {
     }
     unfiledSessions = () => this.sessions().filter(({ date_filed }) => date_filed === "");
 }
+let invoiceTotal = (sessions) => (sessions
+    .map(s => Number(s.charge.replace(/[^0-9.-]+/g, '') || '0'))
+    .reduce((a, b) => a + b, 0));
 let App = ({ defaultData }) => {
     const [pasteData, _setPasteData] = useState(defaultData || null);
     var content = React.createElement("div", null, "Page failed to render :(");
@@ -56,19 +59,29 @@ let App = ({ defaultData }) => {
     };
     if (pasteData != null) {
         let client = new Client(pasteData);
-        console.log(client);
+        let unfiledSessions = client.unfiledSessions();
+        let total = invoiceTotal(unfiledSessions);
         content = React.createElement("div", null,
-            React.createElement("h2", null, client.name()),
+            React.createElement("h2", null,
+                "NL Consulting Invoice for ",
+                client.name()),
+            React.createElement("b", null,
+                "Invoice date: ",
+                new Date().toJSON().slice(0, 10)),
             React.createElement("table", null,
                 React.createElement("thead", null,
                     React.createElement("tr", null,
                         React.createElement("th", null, "Date"),
                         React.createElement("th", null, "Who"),
                         React.createElement("th", null, "Charge"))),
-                React.createElement("tbody", null, client.unfiledSessions().map((s, i) => React.createElement("tr", { key: i },
+                React.createElement("tbody", null, unfiledSessions.map((s, i) => React.createElement("tr", { key: i },
                     React.createElement("td", null, s.date),
                     React.createElement("td", null, s.who),
-                    React.createElement("td", null, s.charge))))));
+                    React.createElement("td", null, s.charge))))),
+            React.createElement("h3", null,
+                "Invoice total: $",
+                total),
+            React.createElement("p", null, "Please make checks payable to NL Consulting."));
     }
     else {
         content = React.createElement("div", null,
